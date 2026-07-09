@@ -190,7 +190,7 @@ static const CCommandInfo k_Commands[kNumCmds] =
   { 2 }, // "SetFileAttributes" },
   { 3 }, // CreateDirectory, SetOutPath
   { 3 }, // "IfFileExists" },
-  { 3 }, // SetRebootFlag, ...
+  { 4 }, // SetRebootFlag, ...
   { 4 }, // "If" }, // IfAbort, IfSilent, IfErrors, IfRebootFlag
   { 2 }, // "Get" }, // GetInstDirError, GetErrorLevel
   { 4 }, // "Rename" },
@@ -3910,6 +3910,10 @@ HRESULT CInArchive::ReadEntries(const CBlockHeader &bh)
         if (params[2] != 0)
         {
           s += " lastused";
+          // (params[3] == (UInt32)(Int32)-1) is possible in NSIS 3.10.
+          // SetDetailsPrint lastused (special)
+          if ((Int32)params[3] < 0)
+            s += " ; (special)";
           break;
         }
         UInt32 v;
@@ -5285,6 +5289,7 @@ HRESULT CInArchive::Parse()
       case NMethodType::kDeflate: m = "zlib"; break;
       case NMethodType::kBZip2: m = "bzip2"; break;
       case NMethodType::kLZMA: m = "lzma"; break;
+      case NMethodType::kZstd: m = "zstd"; break;
       default: break;
     }
     Script += "SetCompressor";
@@ -5750,6 +5755,11 @@ static bool IsBZip2(const Byte *p)
   return (p[0] == 0x31 && p[1] < 14);
 }
 
+static bool IsZstd(const Byte *p)
+{
+  return (p[0] == 0x28 && p[1] == 0xB5 && p[2] == 0x2F && p[3] == 0xFD);
+}
+
 HRESULT CInArchive::Open2(const Byte *sig, size_t size)
 {
   const UInt32 kSigSize = 4 + 1 + 5 + 2; // size, flag, 5 - lzma props, 2 - lzma first bytes
@@ -5799,11 +5809,15 @@ HRESULT CInArchive::Open2(const Byte *sig, size_t size)
       Method = NMethodType::kLZMA;
     else if (IsBZip2(sig + 4))
       Method = NMethodType::kBZip2;
+    else if (IsZstd(sig + 4))
+      Method = NMethodType::kZstd;
     else
       Method = NMethodType::kDeflate;
   }
   else if (IsBZip2(sig))
     Method = NMethodType::kBZip2;
+  else if (IsZstd(sig))
+    Method = NMethodType::kZstd;
   else
     Method = NMethodType::kDeflate;
 

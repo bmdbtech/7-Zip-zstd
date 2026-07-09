@@ -91,7 +91,6 @@ Z7_COM7F_IMF(CDecoder::SetDecoderProperties2(const Byte * prop, UInt32 size))
     return E_NOTIMPL;
 
   memcpy(&_props, pProps, sizeof (DProps));
-
   return S_OK;
 }
 

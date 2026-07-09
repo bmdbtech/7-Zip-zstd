@@ -33,7 +33,9 @@
 
 #include "PropertyNameRes.h"
 
-#include "../../../../DarkMode/src/DarkModeSubclass.h"
+#ifdef ZIP7_DARKMODE
+#include "../../../../DarkMode/lib/include/Darkmodelib.h"
+#endif
 
 using namespace NWindows;
 using namespace NControl;
@@ -1178,6 +1180,7 @@ void CPanel::TestArchives()
   ::TestArchives(paths);
 }
 
+#ifdef ZIP7_DARKMODE
 LRESULT CALLBACK CPanel::ListNotifySubclass(
   HWND hWnd,
   UINT uMsg,
@@ -1199,7 +1202,7 @@ LRESULT CALLBACK CPanel::ListNotifySubclass(
 
     case WM_NOTIFY:
     {
-      if (!DarkMode::isEnabled()
+      if (!dmlib::isEnabled()
         || (!pPanelData->_mySelectMode
           && (!pPanelData->_markDeletedItems
             || !pPanelData->_thereAreDeletedItems)))
@@ -1230,14 +1233,14 @@ LRESULT CALLBACK CPanel::ListNotifySubclass(
               && realIndex != kParentIndex
               && pPanelData->_selectedStatusVector[realIndex])
           {
-            lplvcd->clrTextBk = DarkMode::getHeaderHotBackgroundColor();
+            lplvcd->clrTextBk = dmlib::getHeaderHotBackgroundColor();
           }
 
           if (pPanelData->_markDeletedItems
             && pPanelData->_thereAreDeletedItems
             && pPanelData->IsItem_Deleted(realIndex))
           {
-            lplvcd->clrText = DarkMode::getLinkTextColor();
+            lplvcd->clrText = dmlib::getLinkTextColor();
           }
           return resVal;
         }
@@ -1266,3 +1269,4 @@ void CPanel::setSubclassListNotify()
     ::SetWindowSubclass(_window, ListNotifySubclass, uIdSubclass, reinterpret_cast<DWORD_PTR>(this));
   }
 }
+#endif

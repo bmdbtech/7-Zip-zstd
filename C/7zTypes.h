@@ -1,5 +1,5 @@
 /* 7zTypes.h -- Basic types
-2024-01-24 : Igor Pavlov : Public domain */
+: Igor Pavlov : Public domain */
 
 #ifndef ZIP7_7Z_TYPES_H
 #define ZIP7_7Z_TYPES_H
@@ -46,8 +46,9 @@ typedef int SRes;
 
 
 #ifdef _MSC_VER
+  #define MY_ALIGN_IN_STRUCT(n) __declspec(align(n))
   #if _MSC_VER > 1200
-    #define MY_ALIGN(n) __declspec(align(n))
+    #define MY_ALIGN(n) MY_ALIGN_IN_STRUCT(n)
   #else
     #define MY_ALIGN(n)
   #endif
@@ -58,6 +59,7 @@ typedef int SRes;
   #define MY_ALIGN(n) alignas(n)
   */
   #define MY_ALIGN(n) __attribute__ ((aligned(n)))
+  #define MY_ALIGN_IN_STRUCT(n) MY_ALIGN(n)
 #endif
 
 
@@ -552,6 +554,9 @@ struct ISzAlloc
 // #define ZIP7_DECLARE_HANDLE(name)  typedef void *name;
 #define Z7_DECLARE_HANDLE(name)  struct name##_dummy{int unused;}; typedef struct name##_dummy *name;
 
+// generic min() max() defines
+#define Z7_min(a,b) (((a)>(b))?(b):(a))
+#define Z7_max(a,b) (((a)<(b))?(b):(a))
 
 #define Z7_memset_0_ARRAY(a)  memset((a), 0, sizeof(a))
 

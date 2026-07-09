@@ -77,6 +77,7 @@ static const UInt32 kLangIDs[] =
   IDT_EXTRACT_EXTRACT_TO,
   IDT_EXTRACT_PATH_MODE,
   IDT_EXTRACT_OVERWRITE_MODE,
+  IDX_EXTRACT_OPEN_TRG_FLD,
   // IDX_EXTRACT_ALT_STREAMS,
   IDX_EXTRACT_NT_SECUR,
   IDX_EXTRACT_ELIM_DUP,
@@ -102,8 +103,7 @@ void AddComboItems(NControl::CComboBox &combo, const UInt32 *langIDs, unsigned n
   {
     UString s = LangString(langIDs[i]);
     s.RemoveChar(L'&');
-    const int index = (int)combo.AddString(s);
-    combo.SetItemData(index, (LPARAM)i);
+    combo.AddString_SetItemData(s, (LPARAM)i);
     if (values[i] == curVal)
       curSel = i;
   }
@@ -179,6 +179,7 @@ bool CExtractDialog::OnInit()
     OverwriteMode = _info.OverwriteMode;
 
   // CheckButton_TwoBools(IDX_EXTRACT_ALT_STREAMS, AltStreams, _info.AltStreams);
+  CheckButton_TwoBools(IDX_EXTRACT_OPEN_TRG_FLD, OpnTrgFold, _info.OpnTrgFold);
   CheckButton_TwoBools(IDX_EXTRACT_NT_SECUR,    NtSecurity, _info.NtSecurity);
   CheckButton_TwoBools(IDX_EXTRACT_ELIM_DUP,    ElimDup,    _info.ElimDup);
   
@@ -316,6 +317,7 @@ void CExtractDialog::OnOK()
   #ifndef Z7_NO_REGISTRY
 
   // GetButton_Bools(IDX_EXTRACT_ALT_STREAMS, AltStreams, _info.AltStreams);
+  GetButton_Bools(IDX_EXTRACT_OPEN_TRG_FLD, OpnTrgFold,  _info.OpnTrgFold);
   GetButton_Bools(IDX_EXTRACT_NT_SECUR,    NtSecurity, _info.NtSecurity);
   GetButton_Bools(IDX_EXTRACT_ELIM_DUP,    ElimDup,    _info.ElimDup);
 
